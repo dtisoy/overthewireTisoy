@@ -4,6 +4,10 @@ import pyperclip
 import os
 import re
 import sys
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(prog="Track your overTheWire", description="enter and write the last challenge you made")
 subparsers = parser.add_subparsers(dest="command")
@@ -28,8 +32,8 @@ def cmd_connect():
     password = re_match.group(2)
 
     pyperclip.copy(password)
-    print("password copied")
-    print(f"connecting to bandit{level}...\n\n")
+    logger.info("password copied to your clipboard")
+    logger.info(f"connecting to bandit{level}...\n")
     time.sleep(3)
 
     os.system(f"ssh bandit{level}@bandit.labs.overthewire.org -p 2220")
