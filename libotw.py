@@ -16,10 +16,11 @@ def main(argv = sys.argv[1:]):
     args = parser.parse_args(argv)
 
     match args.command:
+        case "add": cmd_add(args)
         case "connect": cmd_connect()
 
 # connect option
-argsp = subparsers.add_parser("connect", help="join the last challenge you registered")
+subparsers.add_parser("connect", help="join the last challenge you registered")
 def cmd_connect():
     with open("last_bandit", "r") as f:
         text = f.read()
@@ -37,3 +38,15 @@ def cmd_connect():
     time.sleep(3)
 
     os.system(f"ssh bandit{level}@bandit.labs.overthewire.org -p 2220")
+
+# add option
+add_command = subparsers.add_parser("add", help="set the next level and password")
+add_command.add_argument("-l", "--level", required=True)
+add_command.add_argument("-p", "--password", required=True)
+def cmd_add(args):
+    # backup
+    os.system("cp last_bandit last_bandit.backup")
+    with open("last_bandit", "w") as f:
+        f.write(f"bandit: {args.level}\tpassword: {args.password}\n")
+
+    logger.info("you set the next level ;)")
