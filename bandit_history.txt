@@ -1,3 +1,0 @@
-bandit: 17	password: VwOSWtCA7lRKkTfbr2IDh6awj9RNZM5e
-bandit: 18	password: hga5tuuCLF6fFzUpnagiMN8ssu9LFrdg
-bandit: 19	password: awhqfNnAbc1naukrpqDYcF95h7HoMTrC
