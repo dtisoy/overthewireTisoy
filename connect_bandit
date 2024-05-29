@@ -1,8 +1,0 @@
-#!/usr/bin/bash
-
-read -p "bandit level: " level
-read -p "password: " pass
-
-echo -e "bandit: $level\tpassword: $pass" >> bandit_history.txt
-
-ssh bandit"$level"@bandit.labs.overthewire.org -p 2220
