@@ -1,52 +1,30 @@
-import argparse
-import time
-import pyperclip
-import os
-import re
-import sys
-import logging
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from typing import Any
+import click
+from os import system 
+from pyperclip import copy as cp
+from db_manager import DBManager
 
-parser = argparse.ArgumentParser(prog="Track your overTheWire", description="enter and write the last challenge you made")
-subparsers = parser.add_subparsers(dest="command")
 
-def main(argv = sys.argv[1:]):
-    args = parser.parse_args(argv)
+HOST : str = "bandit.labs.overthewire.org"
+PORT : str = "2220"
+manager = DBManager()
 
-    match args.command:
-        case "add": cmd_add(args)
-        case "connect": cmd_connect()
+@click.group()
+def cli(): pass
 
-# connect option
-subparsers.add_parser("connect", help="join the last challenge you registered")
-def cmd_connect():
-    with open("last_bandit", "r") as f:
-        text = f.read()
-    # get the level number and password
-    regex = r"^bandit: (\d+)\s+password: (.+)$"
-    re_obj = re.compile(regex)
-    re_match = re_obj.search(text)
+@cli.command()
+@click.option("-l", "--level", prompt="Level", type=int)
+@click.option("-f", "--flag", prompt="Flag")
+def add_level(level, flag):
+    manager.insert_level(level, flag) 
 
-    level = re_match.group(1)
-    password = re_match.group(2)
-
-    pyperclip.copy(password)
-    logger.info("password copied to your clipboard")
-    logger.info(f"connecting to bandit{level}...\n")
-    time.sleep(3)
-
-    os.system(f"ssh bandit{level}@bandit.labs.overthewire.org -p 2220")
-
-# add option
-add_command = subparsers.add_parser("add", help="set the next level and password")
-add_command.add_argument("-l", "--level", required=True)
-add_command.add_argument("-p", "--password", required=True)
-def cmd_add(args):
-    # backup
-    os.system("cp last_bandit last_bandit.backup")
-    with open("last_bandit", "w") as f:
-        f.write(f"bandit: {args.level}\tpassword: {args.password}\n")
-
-    logger.info("you set the next level ;)")
+@cli.command()
+def connect():
+    last_bandit : Any = manager.get_last_level()
+    level : str =  last_bandit["level"]
+    flag : str = last_bandit["flag"]
+    click.secho(f"connection to bandit level {level}", fg="green")
+    cp(flag)
+    click.secho("password copied", fg="blue")
+    system(f"ssh bandit{level}@{HOST} -p {PORT}")
