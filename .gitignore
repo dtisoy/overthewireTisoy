@@ -1,4 +1,4 @@
 *.pem
-bandit_history.txt
 __pycache__/
-last_bandit*
+venv/
+overthewire.db
